@@ -55,6 +55,7 @@ if (isset($argv)) {
     }
 
     require($dirroot.'config.php');
+    require_once(__DIR__.'/nagios.php');
     require_once($CFG->libdir.'/clilib.php');
 
     list($options, $unrecognized) = cli_get_params(
@@ -100,7 +101,10 @@ Example:
 } else {
     // If run from the web.
     define('NO_MOODLE_COOKIES', true);
+    // Add requirement for IP validation
     require($dirroot.'config.php');
+    require_once(__DIR__.'/nagios.php');
+    require_once(__DIR__.'/iplock.php');
     $options = array(
         'cronerror'   => optional_param('cronerror',   $cronthreshold,   PARAM_NUMBER),
         'cronwarn'    => optional_param('cronwarn',    $cronwarn,        PARAM_NUMBER),
@@ -115,28 +119,6 @@ Example:
     header('Pragma: no-cache');
     header('Cache-Control: private, no-cache, no-store, max-age=0, must-revalidate, proxy-revalidate');
     header('Expires: Tue, 04 Sep 2012 05:32:29 GMT');
-}
-
-$format = '%b %d %H:%M:%S';
-
-$now = userdate(time(), $format);
-
-function send_good($msg) {
-    global $now;
-    printf ("OK: $msg (Checked $now)\n");
-    exit(0);
-}
-
-function send_warning($msg) {
-    global $now;
-    printf ("WARNING: $msg (Checked $now)\n");
-    exit(1);
-}
-
-function send_critical($msg) {
-    global $now;
-    printf ("CRITICAL: $msg (Checked $now)\n");
-    exit(2);
 }
 
 if (moodle_needs_upgrading()) {

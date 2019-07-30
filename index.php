@@ -42,6 +42,7 @@ if (isset($argv) && $argv[0]) {
     $fullcheck = count($argv) > 1 && $argv[1] === 'fullcheck';
 } else {
     define('NO_MOODLE_COOKIES', true);
+    define('CLI_SCRIPT', false);
     $fullcheck = isset($_GET['fullcheck']);
 }
 if (!defined(CLI_SCRIPT)) {
@@ -114,6 +115,11 @@ if (file_exists($testfile)) {
 define('ABORT_AFTER_CONFIG_CANCEL', true);
 require($CFG->dirroot . '/lib/setup.php');
 require_once($CFG->libdir.'/filelib.php');
+
+// IP Locking, check for CLI, check for remote IP in validated list, if not, exit.
+if (!(isset($argv))) {
+    require_once('iplock.php');
+}
 
 if ($fullcheck || $checksession) {
     $c = new curl(array('cache' => false, 'cookie' => true));
